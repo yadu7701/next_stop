@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { MapView } from '../components/MapView';
+import { Stop } from '../lib/supabase';
 
 interface NearYouProps {
   onBack: () => void;
@@ -35,6 +36,39 @@ export function NearYou({ onBack }: NearYouProps) {
 
   const center = useMemo(() => coords || FALLBACK_COORDS, [coords]);
 
+  const mockStops: Stop[] = useMemo(
+    () => [
+      {
+        id: 'mock-stop-1',
+        route_id: 'mock-route',
+        name: 'Kochi City Center',
+        lat: 9.9312,
+        lng: 76.2673,
+        sequence: 1,
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'mock-stop-2',
+        route_id: 'mock-route',
+        name: 'Marine Drive',
+        lat: 9.9816,
+        lng: 76.2767,
+        sequence: 2,
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'mock-stop-3',
+        route_id: 'mock-route',
+        name: 'Ernakulam South',
+        lat: 9.9700,
+        lng: 76.2900,
+        sequence: 3,
+        created_at: new Date().toISOString(),
+      },
+    ],
+    []
+  );
+
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       <div className="flex items-center justify-between px-4 py-3 bg-white shadow-sm">
@@ -65,7 +99,7 @@ export function NearYou({ onBack }: NearYouProps) {
 
       <div className="flex-1 p-4">
         <div className="h-full rounded-xl overflow-hidden shadow">
-          <MapView center={center} />
+          <MapView center={center} stops={mockStops} />
         </div>
       </div>
     </div>

@@ -5,12 +5,14 @@ import { BusDetails } from './screens/BusDetails';
 import { RouteTracking } from './screens/RouteTracking';
 import { AdminMonitor } from './screens/AdminMonitor';
 import { NearYou } from './screens/NearYou';
+import { Results } from './screens/Results';
 
 type Screen =
   | { type: 'passenger-home' }
   | { type: 'bus-details'; busId: string }
   | { type: 'route-tracking'; routeId: string }
   | { type: 'near-you' }
+  | { type: 'results'; params: { from: string; to: string; busNumber?: string } }
   | { type: 'admin-monitor' };
 
 function App() {
@@ -23,6 +25,10 @@ function App() {
 
   const navigateToRouteTracking = (routeId: string) => {
     setCurrentScreen({ type: 'route-tracking', routeId });
+  };
+
+  const navigateToResults = (params: { from: string; to: string; busNumber?: string }) => {
+    setCurrentScreen({ type: 'results', params });
   };
 
   const navigateToNearYou = () => {
@@ -46,6 +52,7 @@ function App() {
             onBusSelect={navigateToBusDetails}
             onMenuClick={() => setMenuOpen(true)}
             onSeeAllStops={navigateToNearYou}
+            onSearchResults={navigateToResults}
           />
         );
       case 'bus-details':
@@ -72,6 +79,13 @@ function App() {
       case 'near-you':
         return (
           <NearYou
+            onBack={navigateToHome}
+          />
+        );
+      case 'results':
+        return (
+          <Results
+            params={currentScreen.params}
             onBack={navigateToHome}
           />
         );

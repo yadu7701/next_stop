@@ -12,6 +12,10 @@ export function AdminMonitor({ onBack }: AdminMonitorProps) {
   const [routes, setRoutes] = useState<Route[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'needs-attention'>('all');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showRemoveForm, setShowRemoveForm] = useState(false);
+  const [formBusNumber, setFormBusNumber] = useState('');
+  const [formRouteId, setFormRouteId] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -60,28 +64,52 @@ export function AdminMonitor({ onBack }: AdminMonitorProps) {
             <p className="text-sm text-gray-600">Bus fleet management</p>
           </div>
         </div>
-
-        <div className="px-4 pb-3 flex gap-2">
-          <button
-            onClick={() => setFilter('all')}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            All Buses ({buses.length})
-          </button>
-          <button
-            onClick={() => setFilter('needs-attention')}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === 'needs-attention'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Needs Attention ({needsAttentionCount})
-          </button>
+        <div className="px-4 pb-3 flex items-center gap-3">
+          <div className="flex-1 flex gap-2">
+            <button
+              onClick={() => setFilter('all')}
+              className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Buses ({buses.length})
+            </button>
+            <button
+              onClick={() => setFilter('needs-attention')}
+              className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'needs-attention'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Needs Attention ({needsAttentionCount})
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setFormBusNumber('');
+                setFormRouteId(routes[0]?.id ?? '');
+                setShowAddForm(true);
+                setShowRemoveForm(false);
+              }}
+              className="px-3 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => {
+                setFormBusNumber('');
+                setShowRemoveForm(true);
+                setShowAddForm(false);
+              }}
+              className="px-3 py-2 rounded-lg bg-gray-200 text-gray-800 font-semibold hover:bg-gray-300 transition"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       </div>
 
@@ -159,6 +187,103 @@ export function AdminMonitor({ onBack }: AdminMonitorProps) {
           </div>
         )}
       </div>
+
+      {(showAddForm || showRemoveForm) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">{showAddForm ? 'Add Bus' : 'Remove Bus'}</h3>
+              <button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setShowRemoveForm(false);
+                }}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm text-gray-700">Bus Number</label>
+                <input
+                  value={formBusNumber}
+                  onChange={(e) => setFormBusNumber(e.target.value)}
+                  className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  placeholder="e.g., KL-07-999"
+                />
+              </div>
+              {showAddForm && (
+                <div>
+                  <label className="text-sm text-gray-700">Route</label>
+                  <select
+                    value={formRouteId}
+                    onChange={(e) => setFormRouteId(e.target.value)}
+                    className="mt-1 w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  >
+                    {routes.map((route) => (
+                      <option key={route.id} value={route.id}>
+                        {route.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setShowRemoveForm(false);
+                }}
+                className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              {showAddForm ? (
+                <button
+                  onClick={() => {
+                    if (!formBusNumber || !formRouteId) return;
+                    const now = new Date().toISOString();
+                    const newBus: Bus = {
+                      id: `mock-${Date.now()}`,
+                      number: formBusNumber,
+                      route_id: formRouteId,
+                      current_lat: 0,
+                      current_lng: 0,
+                      status: 'on-time',
+                      next_stop_id: null,
+                      pollution_level: 'low',
+                      maintenance_status: 'ok',
+                      updated_at: now,
+                      created_at: now,
+                    };
+                    setBuses((prev) => [...prev, newBus]);
+                    setShowAddForm(false);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (!formBusNumber) return;
+                    setBuses((prev) => prev.filter((b) => b.number !== formBusNumber));
+                    setShowRemoveForm(false);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white border-t border-gray-200 p-4">
         <div className="flex items-center justify-between text-sm">

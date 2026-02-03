@@ -33,7 +33,7 @@ export interface Bus {
   route_id: string;
   current_lat: number;
   current_lng: number;
-  status: 'on-time' | 'delayed' | 'overcrowded';
+  status: 'on-time' | 'delayed' | 'overcrowded' | 'breakdown';
   next_stop_id: string | null;
   pollution_level: 'low' | 'medium' | 'high';
   maintenance_status: 'ok' | 'needs-service';

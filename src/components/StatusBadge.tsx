@@ -1,5 +1,14 @@
 interface StatusBadgeProps {
-  status: 'on-time' | 'delayed' | 'overcrowded' | 'low' | 'medium' | 'high' | 'ok' | 'needs-service';
+  status:
+    | 'on-time'
+    | 'delayed'
+    | 'overcrowded'
+    | 'breakdown'
+    | 'low'
+    | 'medium'
+    | 'high'
+    | 'ok'
+    | 'needs-service';
   type?: 'bus' | 'pollution' | 'maintenance';
 }
 
@@ -13,6 +22,8 @@ export function StatusBadge({ status, type = 'bus' }: StatusBadgeProps) {
           return 'bg-yellow-100 text-yellow-700';
         case 'overcrowded':
           return 'bg-red-100 text-red-700';
+        case 'breakdown':
+          return 'bg-red-200 text-red-800';
         default:
           return 'bg-gray-100 text-gray-700';
       }
@@ -41,7 +52,16 @@ export function StatusBadge({ status, type = 'bus' }: StatusBadgeProps) {
 
   const getLabel = () => {
     if (type === 'bus') {
-      return status === 'on-time' ? 'On Time' : status === 'overcrowded' ? 'Overcrowded' : 'Delayed';
+      switch (status) {
+        case 'on-time':
+          return 'On Time';
+        case 'overcrowded':
+          return 'Overcrowded';
+        case 'breakdown':
+          return 'Breakdown';
+        default:
+          return 'Delayed';
+      }
     } else if (type === 'pollution') {
       return status.charAt(0).toUpperCase() + status.slice(1);
     } else {
