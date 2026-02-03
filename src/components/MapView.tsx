@@ -12,7 +12,7 @@ interface MapViewProps {
 }
 
 export function MapView({ buses = [], stops = [], center, showRoute = false, selectedBusId }: MapViewProps) {
-  const defaultCenter: [number, number] = [9.5916, 76.5222];
+  const defaultCenter = useMemo<[number, number]>(() => [9.5916, 76.5222], []);
 
   const resolvedCenter = useMemo<[number, number]>(() => {
     if (center) return [center.lat, center.lng];
